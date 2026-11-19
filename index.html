@@ -386,11 +386,11 @@
             // 只有一组时的格式
             const item = allParsedParams[0];
             resultStr = 
-            `
-            会员账号: ${item.p1}
-            存款金额: ${item.p2}
-            申请彩金: ${item.p4}
-            存款日期: ${item.p7}
+`会员账号: ${item.p1}
+存款金额: ${item.p2}
+申请彩金: ${item.p4}
+存款日期: ${item.p7}
+
             `;
         } else {
             // 多组时的横向拼接格式
@@ -400,11 +400,11 @@
             const p7List = allParsedParams.map(item => item.p7).join('  ');
 
             resultStr = 
-            `
-            会员账号: ${p1List}
-            存款金额: ${p2List}
-            申请彩金: ${p4List}
-            存款日期: ${p7List}
+`会员账号: ${p1List}
+存款金额: ${p2List}
+申请彩金: ${p4List}
+存款日期: ${p7List}
+
             `;
         }
 
