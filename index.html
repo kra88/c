@@ -387,10 +387,10 @@
             const item = allParsedParams[0];
             resultStr = 
             `
-            字符: ${item.p1}
-            数额: ${item.p2}
-            个数: ${item.p3}
-            时间: ${item.p7}
+            会员账号: ${item.p1}
+            存款金额: ${item.p2}
+            申请彩金: ${item.p4}
+            存款日期: ${item.p7}
             `;
         } else {
             // 多组时的横向拼接格式
@@ -403,7 +403,7 @@
             `
             会员账号: ${p1List}
             存款金额: ${p2List}
-            申请彩金: ${p3List}
+            申请彩金: ${p4List}
             存款日期: ${p7List}
             `;
         }
