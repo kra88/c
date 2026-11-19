@@ -369,7 +369,7 @@
                 allParsedParams.push({
                     p1: restoredParams[0],
                     p2: restoredParams[1],
-                    p3: restoredParams[2],
+                    p4: restoredParams[3],
                     p7: restoredParams[6]
                 });
             }
@@ -396,7 +396,7 @@
             // 多组时的横向拼接格式
             const p1List = allParsedParams.map(item => item.p1).join('  ');
             const p2List = allParsedParams.map(item => item.p2).join('  ');
-            const p3List = allParsedParams.map(item => item.p3).join('  ');
+            const p4List = allParsedParams.map(item => item.p4).join('  ');
             const p7List = allParsedParams.map(item => item.p7).join('  ');
 
             resultStr = 
