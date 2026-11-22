@@ -203,12 +203,10 @@
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
             transition: transform 0.26s cubic-bezier(0.4, 0, 0.2, 1), background 0.26s ease;
-            /* 默认“复”在右侧 */
             transform: translateX(100%);
         }
 
         .segmented-switch.is-first .segmented-thumb {
-            /* 切换到“首”在左侧 */
             transform: translateX(0%);
             background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
             box-shadow: 0 2px 8px rgba(236, 72, 153, 0.4);
@@ -273,6 +271,122 @@
         button.copy-btn:hover {
             background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
             box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+        }
+
+        /* 可向下展开的附加参数表格 */
+        .collapsible-section {
+            margin-top: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.38);
+            overflow: hidden;
+        }
+
+        .collapse-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(30, 41, 59, 0.55);
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            color: #cbd5e1;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .collapse-toggle:hover {
+            background: rgba(51, 65, 85, 0.65);
+            color: #f8fafc;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .collapse-toggle:active {
+            transform: none;
+        }
+
+        .collapse-arrow {
+            display: inline-block;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #38bdf8;
+            font-size: 12px;
+        }
+
+        .collapsible-section.is-open .collapse-arrow {
+            transform: rotate(180deg);
+        }
+
+        .collapse-panel {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .collapsible-section.is-open .collapse-panel {
+            grid-template-rows: 1fr;
+        }
+
+        .collapse-inner {
+            overflow: hidden;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .param-table th,
+        .param-table td {
+            padding: 10px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: left;
+        }
+
+        .param-table th {
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 13px;
+            background: rgba(15, 23, 42, 0.45);
+            width: 30%;
+        }
+
+        .param-table td.category-cell {
+            color: #e2e8f0;
+            font-weight: 500;
+            width: 30%;
+            background: rgba(15, 23, 42, 0.22);
+        }
+
+        .param-table td.input-cell {
+            width: 70%;
+            padding: 7px 12px;
+        }
+
+        .param-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #f8fafc;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .param-input::placeholder {
+            color: #64748b;
+        }
+
+        .param-input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.16);
         }
 
         #toast {
@@ -363,11 +477,86 @@
             <span class="segmented-option option-repeat">复</span>
         </div>
     </div>
+
+    <div class="collapsible-section" id="extra-table-section">
+        <button
+            type="button"
+            class="collapse-toggle"
+            aria-expanded="false"
+            aria-controls="extra-table-panel"
+            onclick="toggleExtraTable()"
+        >
+            <span>附加参数配置（单双后缀 / 多组后缀 / 转换登记）</span>
+            <span class="collapse-arrow" id="collapse-arrow">▼</span>
+        </button>
+        <div class="collapse-panel" id="extra-table-panel">
+            <div class="collapse-inner">
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>类别</th>
+                            <th>参数</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="category-cell">单双</td>
+                            <td class="input-cell">
+                                <input
+                                    type="text"
+                                    id="param-dandiao-suffix"
+                                    class="param-input"
+                                    placeholder="后缀（留空则不追加）"
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="category-cell">多组</td>
+                            <td class="input-cell">
+                                <input
+                                    type="text"
+                                    id="param-duozu-suffix"
+                                    class="param-input"
+                                    placeholder="后缀（留空则不追加）"
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="category-cell">转换</td>
+                            <td class="input-cell">
+                                <input
+                                    type="text"
+                                    id="param-convert-register"
+                                    class="param-input"
+                                    placeholder="登记（填写后填入“转换”结果第4列）"
+                                >
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
     // 默认为“复”（对应“复存”）；切换后为“首”（对应“首存”）
     let isFirstDeposit = false;
+
+    function toggleExtraTable() {
+        const section = document.getElementById('extra-table-section');
+        const btn = section.querySelector('.collapse-toggle');
+        const isOpen = section.classList.toggle('is-open');
+        btn.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function getExtraParams() {
+        return {
+            dandiaoSuffix: document.getElementById('param-dandiao-suffix').value.trim(),
+            duozuSuffix: document.getElementById('param-duozu-suffix').value.trim(),
+            convertRegister: document.getElementById('param-convert-register').value.trim()
+        };
+    }
 
     function getCurrentDepositMode() {
         return isFirstDeposit ? '首存' : '复存';
@@ -397,10 +586,13 @@
         showToast(`当前已切换为：${isFirstDeposit ? '首（首存）' : '复（复存）'}`);
     }
 
-    // 解析 {参数2} 数值：忽略 "," 和 "."
+    // 解析 {参数2} 数值用于阈值计算：移除千分位逗号，保留小数点
     function parseParam2Number(rawVal) {
         if (rawVal === undefined || rawVal === null) return NaN;
-        const cleaned = String(rawVal).replace(/[,，.。]/g, '').trim();
+        const cleaned = String(rawVal)
+            .replace(/[,，]/g, '')
+            .replace(/。/g, '.')
+            .trim();
         if (!cleaned) return NaN;
         return Number(cleaned);
     }
@@ -447,7 +639,7 @@
     }
 
     // “转换”功能：每行为一个参数，第1行为 {参数1}，以此类推
-    // 输出格式：{参数2}\t{首/复}\t{对应数额}\t\t\t{参数1}\t{参数10}（每个参数独立占一列）
+    // 输出格式：{参数2}\t{首/复}\t{对应数额}\t{登记}\t\t{参数1}\t{参数10}（每个参数独立占一列）
     function convertLineParams() {
         const input = document.getElementById('input-text').value;
         if (!input.trim()) {
@@ -460,6 +652,7 @@
         while (rawLines.length > 0 && rawLines[rawLines.length - 1].trim() === '') rawLines.pop();
 
         const mode = getCurrentDepositMode();
+        const { convertRegister } = getExtraParams();
         const groupSize = 10;
         const results = [];
 
@@ -474,13 +667,12 @@
 
             const p2Num = parseParam2Number(p2Raw);
             const mappedAmount = getCorrespondingAmount(p2Num, mode);
-            const p2Display = Number.isNaN(p2Num) ? p2Raw : String(p2Num);
 
             const columns = [
-                p2Display,
+                p2Raw,
                 mode,
                 String(mappedAmount),
-                '',
+                convertRegister,
                 '',
                 p1,
                 p10
@@ -496,7 +688,7 @@
 
         document.getElementById('output-text').value = results.join('\n');
         setResultStats(`成功处理 ${results.length} 组`);
-        showToast(`转换完成（${mode}）！`);
+        showToast(convertRegister ? `转换完成（${mode} · 登记：${convertRegister}）！` : `转换完成（${mode}）！`);
     }
 
     function formatText() {
@@ -515,6 +707,7 @@
             return;
         }
 
+        const { duozuSuffix } = getExtraParams();
         const lines = input.split(/\r?\n/);
         const processedLines = [];
 
@@ -542,7 +735,11 @@
                     restoredParams[6]
                 ];
 
-                processedLines.push(filtered.join(' '));
+                let rowStr = filtered.join(' ');
+                if (duozuSuffix) {
+                    rowStr += ` ${duozuSuffix}`;
+                }
+                processedLines.push(rowStr);
             }
         });
 
@@ -558,6 +755,7 @@
             return;
         }
 
+        const { dandiaoSuffix } = getExtraParams();
         const lines = input.split(/\r?\n/);
         const allParsedParams = [];
 
@@ -612,6 +810,10 @@
 申请彩金: ${p4List}
 存款日期: ${p7List}
 `;
+        }
+
+        if (dandiaoSuffix) {
+            resultStr = resultStr.trimEnd() + `\n${dandiaoSuffix}\n`;
         }
 
         document.getElementById('output-text').value = resultStr;
