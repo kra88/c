@@ -24,14 +24,14 @@
 
         .container {
             width: 100%;
-            max-width: 840px;
+            max-width: 900px;
             background: rgba(30, 41, 59, 0.65);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             padding: 36px;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
                         inset 0 1px 0 rgba(255, 255, 255, 0.1);
             position: relative;
         }
@@ -74,13 +74,31 @@
             flex-direction: column;
         }
 
+        .label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            gap: 8px;
+            min-height: 22px;
+        }
+
         label {
             font-weight: 500;
-            margin-bottom: 10px;
             color: #94a3b8;
             font-size: 13px;
             letter-spacing: 0.5px;
             text-transform: uppercase;
+        }
+
+        .result-badge {
+            font-size: 12px;
+            color: #38bdf8;
+            background: rgba(15, 23, 42, 0.55);
+            padding: 3px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            white-space: nowrap;
         }
 
         textarea {
@@ -118,6 +136,14 @@
             flex-wrap: wrap;
         }
 
+        .convert-row {
+            margin-top: 14px;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
         button {
             padding: 11px 20px;
             background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
@@ -139,6 +165,70 @@
 
         button:active {
             transform: translateY(1px) scale(0.98);
+        }
+
+        button.convert-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.28);
+        }
+
+        button.convert-btn:hover {
+            background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.38);
+        }
+
+        /* 首 / 复 滑动开关样式 */
+        .segmented-switch {
+            position: relative;
+            display: inline-grid;
+            grid-template-columns: 1fr 1fr;
+            width: 112px;
+            height: 40px;
+            padding: 3px;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+        }
+
+        .segmented-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: calc(50% - 3px);
+            height: calc(100% - 6px);
+            border-radius: 999px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+            transition: transform 0.26s cubic-bezier(0.4, 0, 0.2, 1), background 0.26s ease;
+            /* 默认“复”在右侧 */
+            transform: translateX(100%);
+        }
+
+        .segmented-switch.is-first .segmented-thumb {
+            /* 切换到“首”在左侧 */
+            transform: translateX(0%);
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            box-shadow: 0 2px 8px rgba(236, 72, 153, 0.4);
+        }
+
+        .segmented-option {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #94a3b8;
+            transition: color 0.2s ease;
+        }
+
+        .segmented-switch.is-first .option-first,
+        .segmented-switch:not(.is-first) .option-repeat {
+            color: #ffffff;
         }
 
         button.special {
@@ -185,20 +275,6 @@
             box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
         }
 
-        .stats-wrapper {
-            display: flex;
-            align-items: center;
-        }
-
-        .stats {
-            font-size: 13px;
-            color: #64748b;
-            background: rgba(15, 23, 42, 0.3);
-            padding: 10px 12px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
         #toast {
             position: absolute;
             top: 20px;
@@ -235,9 +311,6 @@
             button.copy-btn {
                 margin-left: 0;
             }
-            .stats-wrapper {
-                justify-content: space-between;
-            }
         }
     </style>
 </head>
@@ -247,33 +320,63 @@
     <div id="toast">提示信息</div>
 
     <h2>多行转换工具</h2>
-    
+
     <div class="grid">
         <div class="box">
-            <label for="input-text">输入原始文本</label>
-            <textarea id="input-text" placeholder="在此粘贴数据..."></textarea>
+            <div class="label-row">
+                <label for="input-text">输入原始文本</label>
+            </div>
+            <textarea id="input-text" placeholder="在此粘贴数据（“转换”功能支持每行为一个参数，第1行为{参数1}，以此类推）..."></textarea>
         </div>
-        
+
         <div class="box">
-            <label for="output-text">转换结果</label>
+            <div class="label-row">
+                <label for="output-text">转换结果</label>
+                <span class="result-badge" id="result-stats">成功处理 0 组</span>
+            </div>
             <textarea id="output-text" placeholder="转换后的内容..." readonly></textarea>
         </div>
     </div>
 
     <div class="actions">
-        <button onclick="formatText()">换行转换</button>
-        <button class="special" onclick="filterAndTransformParams()">过滤</button>
-        <button class="custom-btn" onclick="formatDepositParams()">首复存</button>
-        <button class="danger" onclick="clearContent()">清除内容</button>
-        
+        <button onclick="formatText()">换行</button>
+        <button class="special" onclick="filterAndTransformParams()">多组</button>
+        <button class="custom-btn" onclick="formatDepositParams()">单双</button>
+        <button class="danger" onclick="clearContent()">清空</button>
         <button class="copy-btn" onclick="copyResult()">复制</button>
-        <div class="stats-wrapper">
-            <span class="stats" id="stats-info">共 0 行</span>
+    </div>
+
+    <div class="convert-row">
+        <button class="convert-btn" onclick="convertLineParams()">转换</button>
+        <div
+            id="deposit-switch"
+            class="segmented-switch"
+            role="switch"
+            aria-checked="false"
+            tabindex="0"
+            onclick="toggleDepositMode()"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDepositMode();}"
+            title="点击切换 首 / 复"
+        >
+            <span class="segmented-thumb"></span>
+            <span class="segmented-option option-first">首</span>
+            <span class="segmented-option option-repeat">复</span>
         </div>
     </div>
 </div>
 
 <script>
+    // 默认为“复”（对应“复存”）；切换后为“首”（对应“首存”）
+    let isFirstDeposit = false;
+
+    function getCurrentDepositMode() {
+        return isFirstDeposit ? '首存' : '复存';
+    }
+
+    function setResultStats(text) {
+        document.getElementById('result-stats').innerText = text;
+    }
+
     function showToast(message, isError = false) {
         const toast = document.getElementById('toast');
         toast.innerText = message;
@@ -286,13 +389,123 @@
         }, 2500);
     }
 
+    function toggleDepositMode() {
+        isFirstDeposit = !isFirstDeposit;
+        const switchEl = document.getElementById('deposit-switch');
+        switchEl.classList.toggle('is-first', isFirstDeposit);
+        switchEl.setAttribute('aria-checked', String(isFirstDeposit));
+        showToast(`当前已切换为：${isFirstDeposit ? '首（首存）' : '复（复存）'}`);
+    }
+
+    // 解析 {参数2} 数值：忽略 "," 和 "."
+    function parseParam2Number(rawVal) {
+        if (rawVal === undefined || rawVal === null) return NaN;
+        const cleaned = String(rawVal).replace(/[,，.。]/g, '').trim();
+        if (!cleaned) return NaN;
+        return Number(cleaned);
+    }
+
+    // 保留时间字符串中的 "-" 不做 "/" 替换
+    function preserveDateDash(val) {
+        if (val === undefined || val === null) return '';
+        return String(val).trim();
+    }
+
+    // 根据 {参数2} 数值与当前 首/复 模式计算 {对应数额}
+    function getCorrespondingAmount(amountNum, mode) {
+        if (Number.isNaN(amountNum)) return '';
+
+        if (mode === '首存') {
+            if (amountNum >= 999901) return 388888;
+            if (amountNum >= 499901) return 208888;
+            if (amountNum >= 199901) return 8888;
+            if (amountNum >= 119901) return 4588;
+            if (amountNum >= 79901) return 3588;
+            if (amountNum >= 49901) return 2588;
+            if (amountNum >= 29901) return 1588;
+            if (amountNum >= 9901) return 688;
+            if (amountNum >= 4901) return 388;
+            if (amountNum >= 2901) return 258;
+            if (amountNum >= 901) return 178;
+            if (amountNum >= 401) return 88;
+            return '';
+        } else {
+            if (amountNum >= 999901) return 10888;
+            if (amountNum >= 499901) return 6988;
+            if (amountNum >= 199901) return 3988;
+            if (amountNum >= 119901) return 2988;
+            if (amountNum >= 79901) return 1988;
+            if (amountNum >= 49901) return 1188;
+            if (amountNum >= 29901) return 808;
+            if (amountNum >= 9901) return 368;
+            if (amountNum >= 4901) return 228;
+            if (amountNum >= 2901) return 108;
+            if (amountNum >= 901) return 58;
+            if (amountNum >= 401) return 38;
+            return '';
+        }
+    }
+
+    // “转换”功能：每行为一个参数，第1行为 {参数1}，以此类推
+    // 输出格式：{参数2}\t{首/复}\t{对应数额}\t\t\t{参数1}\t{参数10}（每个参数独立占一列）
+    function convertLineParams() {
+        const input = document.getElementById('input-text').value;
+        if (!input.trim()) {
+            showToast('请输入需要处理的文本！', true);
+            return;
+        }
+
+        const rawLines = input.split(/\r?\n/);
+        while (rawLines.length > 0 && rawLines[0].trim() === '') rawLines.shift();
+        while (rawLines.length > 0 && rawLines[rawLines.length - 1].trim() === '') rawLines.pop();
+
+        const mode = getCurrentDepositMode();
+        const groupSize = 10;
+        const results = [];
+
+        for (let i = 0; i < rawLines.length; i += groupSize) {
+            const slice = rawLines.slice(i, i + groupSize);
+            const p1 = (slice[0] ?? '').trim();
+            const p2Raw = (slice[1] ?? '').trim();
+            // {参数10} 保留 "-" 不转换为 "/"
+            const p10 = preserveDateDash(slice[9] ?? '');
+
+            if (!p1 && !p2Raw && !p10) continue;
+
+            const p2Num = parseParam2Number(p2Raw);
+            const mappedAmount = getCorrespondingAmount(p2Num, mode);
+            const p2Display = Number.isNaN(p2Num) ? p2Raw : String(p2Num);
+
+            const columns = [
+                p2Display,
+                mode,
+                String(mappedAmount),
+                '',
+                '',
+                p1,
+                p10
+            ];
+
+            results.push(columns.join('\t'));
+        }
+
+        if (results.length === 0) {
+            showToast('未解析到有效参数！', true);
+            return;
+        }
+
+        document.getElementById('output-text').value = results.join('\n');
+        setResultStats(`成功处理 ${results.length} 组`);
+        showToast(`转换完成（${mode}）！`);
+    }
+
     function formatText() {
         const input = document.getElementById('input-text').value;
         const items = input.split(/[\s,，、;]+/).filter(Boolean);
         const result = items.join('\n');
-        
+
         document.getElementById('output-text').value = result;
-        document.getElementById('stats-info').innerText = `共 ${items.length} 行`;
+        setResultStats(`共 ${items.length} 行`);
     }
 
     function filterAndTransformParams() {
@@ -318,7 +531,7 @@
             }
 
             const params = currentLine.split(/[\s；、，]+/).filter(Boolean);
-            const restoredParams = params.map(p => p.replace('___TIME_SPACE___', ' '));
+            const restoredParams = params.map(p => preserveDateDash(p.replace('___TIME_SPACE___', ' ')));
 
             if (restoredParams.length >= 7) {
                 const filtered = [
@@ -328,17 +541,16 @@
                     restoredParams[3],
                     restoredParams[6]
                 ];
-                
+
                 processedLines.push(filtered.join(' '));
             }
         });
 
         document.getElementById('output-text').value = processedLines.join('\n');
-        document.getElementById('stats-info').innerText = `有效保留 ${processedLines.length} 组`;
-        showToast('过滤完成！');
+        setResultStats(`成功处理 ${processedLines.length} 组`);
+        showToast('多组过滤完成！');
     }
 
-    // 首复存功能（支持单组纵向、多组横向拼接）
     function formatDepositParams() {
         const input = document.getElementById('input-text').value;
         if (!input.trim()) {
@@ -354,16 +566,14 @@
 
             let currentLine = line.trim();
 
-            // 保护第7个参数的时间，避免被空格切断
             let timeMatch = currentLine.match(/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/);
             if (timeMatch) {
                 let protectedTime = timeMatch[0];
                 currentLine = currentLine.replace(protectedTime, protectedTime.replace(' ', '___TIME_SPACE___'));
             }
 
-            // 切分参数（忽略第2个参数中的英文逗号和点号）
             const params = currentLine.split(/[\s；、，]+/).filter(Boolean);
-            const restoredParams = params.map(p => p.replace('___TIME_SPACE___', ' '));
+            const restoredParams = params.map(p => preserveDateDash(p.replace('___TIME_SPACE___', ' ')));
 
             if (restoredParams.length >= 7) {
                 allParsedParams.push({
@@ -383,22 +593,20 @@
         let resultStr = '';
 
         if (allParsedParams.length === 1) {
-            // 只有一组时的格式
             const item = allParsedParams[0];
-            resultStr = 
+            resultStr =
 `会员账号: ${item.p1}
 存款金额: ${item.p2}
 申请彩金: ${item.p4}
 存款日期: ${item.p7}
 `;
         } else {
-            // 多组时的横向拼接格式
             const p1List = allParsedParams.map(item => item.p1).join('  ');
             const p2List = allParsedParams.map(item => item.p2).join('  ');
             const p4List = allParsedParams.map(item => item.p4).join('  ');
             const p7List = allParsedParams.map(item => item.p7).join('  ');
 
-            resultStr = 
+            resultStr =
 `会员账号: ${p1List}
 存款金额: ${p2List}
 申请彩金: ${p4List}
@@ -407,26 +615,26 @@
         }
 
         document.getElementById('output-text').value = resultStr;
-        document.getElementById('stats-info').innerText = `成功处理 ${allParsedParams.length} 组数据`;
-        showToast('首复存整理完成！');
+        setResultStats(`成功处理 ${allParsedParams.length} 组`);
+        showToast('单双整理完成！');
     }
 
     function clearContent() {
         document.getElementById('input-text').value = '';
         document.getElementById('output-text').value = '';
-        document.getElementById('stats-info').innerText = '共 0 行';
-        showToast('内容已清除');
+        setResultStats('成功处理 0 组');
+        showToast('内容已清空');
     }
 
     function copyResult() {
         const outputText = document.getElementById('output-text');
         const textToCopy = outputText.value;
-        
+
         if (!textToCopy) {
             showToast('当前没有可复制的内容！', true);
             return;
         }
-        
+
         navigator.clipboard.writeText(textToCopy).then(() => {
             showToast('复制成功！');
         }).catch(err => {
