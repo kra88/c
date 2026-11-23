@@ -735,15 +735,16 @@
                     restoredParams[6]
                 ];
 
-                let rowStr = filtered.join(' ');
-                if (duozuSuffix) {
-                    rowStr += ` ${duozuSuffix}`;
-                }
-                processedLines.push(rowStr);
+                processedLines.push(filtered.join(' '));
             }
         });
 
-        document.getElementById('output-text').value = processedLines.join('\n');
+        let finalOutput = processedLines.join('\n');
+        if (finalOutput && duozuSuffix) {
+            finalOutput += `\n${duozuSuffix}`;
+        }
+
+        document.getElementById('output-text').value = finalOutput;
         setResultStats(`成功处理 ${processedLines.length} 组`);
         showToast('多组过滤完成！');
     }
